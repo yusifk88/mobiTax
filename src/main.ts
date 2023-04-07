@@ -4,6 +4,9 @@ import router from './router';
 
 import axios from "axios";
 
+// @ts-ignore
+import FlagIcon from 'vue-flag-icon';
+
 import {IonicVue} from '@ionic/vue';
 
 /* Core CSS required for Ionic components to work properly */
@@ -25,19 +28,25 @@ import '@ionic/vue/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
-const app = createApp(App)
+// @ts-ignore
+import store from './store'
+
+const app = createApp(App).use(store)
     .use(IonicVue)
-    .use(router);
+    .use(router)
+    .use(FlagIcon);
 
 router.isReady().then(() => {
 
     axios.defaults.baseURL = "https://web.builtaccounting.com/api";
 
     axios.get("/countries/with-taxes")
-        .then(res=>{
+        .then(res => {
             const countries = res.data.data;
+            localStorage.setItem("countries", JSON.stringify(countries));
 
-            console.log(countries);
+            store.state.countries = countries;
+
         })
 
     app.mount('#app');
