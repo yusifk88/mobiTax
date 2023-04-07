@@ -17,10 +17,10 @@
       <ion-img style=" height: 250px; z-index: 9999!important; position: absolute; left: 20%;" src="https://built-storage.ams3.cdn.digitaloceanspaces.com/Built%2Fpreviewed_1.png"></ion-img>
 
 
-      <ion-card color="success" class="ion-text-center ion-no-margin" style="height: 300px; margin-top: 100px; z-index: 99!important; margin-bottom: 40px; border-top-left-radius: 50%;border-top-right-radius: 50%;">
+      <ion-card color="light" class="ion-text-center" style="height: 300px; margin-top: 100px; z-index: 99!important; margin-bottom: 40px; border-top-left-radius: 50%;border-top-right-radius: 50%;">
 
 
-          <h1 style="color: #ffffff; margin-top: 130px">Get Built Accounting</h1>
+          <h1 style="margin-top: 130px">Get Built Accounting</h1>
         <p>Simple accounting on the go!</p>
         <a>
           <img height="80" src="https://built-storage.ams3.cdn.digitaloceanspaces.com/Built%2Fapple_appstore.png">
@@ -79,7 +79,7 @@
   </ion-page>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
 import {
   IonContent,
   IonHeader,
@@ -91,17 +91,21 @@ import {
   IonToolbar,
     IonText,
 } from '@ionic/vue';
-import MessageListItem from '@/components/MessageListItem.vue';
+
 import {chevronForward,calculatorOutline,speedometerOutline} from "ionicons/icons";
-import { getMessages, Message } from '@/data/messages';
-import { ref } from 'vue';
 import CountrySelector from "@/components/CountrySelector.vue";
+import {defineComponent} from "vue";
 
-const messages = ref<Message[]>(getMessages());
+export default defineComponent({
+  name:"HomePage",
+  components:{IonPage,IonContent,IonList,IonRefresherContent,IonRefresher,IonTitle,IonToolbar,IonText,IonHeader,CountrySelector},
+  data(){
+    return{
+      chevronForward,calculatorOutline,speedometerOutline
+    }
+  }
 
-const refresh = (ev: CustomEvent) => {
-  setTimeout(() => {
-    ev.detail.complete();
-  }, 3000);
-};
+});
+
+
 </script>

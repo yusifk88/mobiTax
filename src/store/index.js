@@ -3,7 +3,8 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     countries:[],
-    myCountry:"GH"
+    myCountry:"GH",
+    selectedTax:null
   },
   mutations: {
   },
