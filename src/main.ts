@@ -37,6 +37,12 @@ const app = createApp(App).use(store)
     .use(FlagIcon);
 
 router.isReady().then(() => {
+    if (localStorage.getItem('countries')) {
+
+        const countryString = localStorage.getItem('countries');
+        store.state.countries = JSON.parse(countryString);
+
+    }
 
     axios.defaults.baseURL = "https://web.builtaccounting.com/api";
 

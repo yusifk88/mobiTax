@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header :translucent="true" class="ion-no-border custom">
       <ion-toolbar>
-        <ion-buttons slot="start" @click="isOpen=false">
+        <ion-buttons slot="start" @click="store.state.taxSheetOpen=false">
           <ion-back-button default-href="/" text="Home"></ion-back-button>
         </ion-buttons>
         <ion-title>Sales taxes calculator</ion-title>
@@ -23,12 +23,19 @@
 
       <span v-show="defaultTax">
 
+        <ion-item>
+          <ion-toggle mode="ios" @ionChange="haddleToggle">Amount includes tax</ion-toggle>
+        </ion-item>
+
         <ion-card>
           <ion-card-content class="ion-no-padding">
-            <input id="amount-input" v-model="amount" class="number-input" placeholder="0.00" type="number">
+            <input id="amount-input" v-model="amount" class="number-input" placeholder="Amount" type="number">
           </ion-card-content>
         </ion-card>
-      <ion-card>
+
+
+      <ion-card v-if="!taxInclusive" style="transition: 0.3s ease-in-out">
+
         <ion-card-content v-if="defaultTax" class="ion-no-padding">
           <h1 v-if="defaultTax && defaultTax.type=='Flat'"
               style="font-weight: lighter; font-size: 25px; border-bottom: 1px solid grey">{{
@@ -57,11 +64,43 @@
     }}</p>
 
 
-
  </span>
 
         </ion-card-content>
+
+
       </ion-card>
+
+
+      <ion-card v-else style="transition: 0.3s ease-in-out">
+
+        <ion-card-content class="ion-no-padding">
+
+            <p style="font-weight: lighter; font-size: 35px; border-bottom: 1px double; margin-top: 30px">Amount :{{
+                formatedOriginalAmount
+              }}</p>
+
+          <p style="font-weight: lighter; font-size: 35px; border-bottom: 1px double; margin-top: 30px">Tax ({{ defaultTax.rate }}%):{{
+              totalTax
+            }}
+
+            <small style="font-size: 14px; display: block" v-if="defaultTax.sub_tax">
+
+            Includes:
+            <span v-for="subtax in defaultTax.sub_tax" :key="subtax.id">
+              {{ subtax.name }}({{ subtax.rate }}%),
+            </span>
+
+          </small>
+
+          </p>
+
+        </ion-card-content>
+
+
+      </ion-card>
+
+
       </span>
 
       <ion-modal
@@ -69,7 +108,7 @@
           :backdrop-dismiss="false"
           :breakpoints="[0.2,0.25, 0.5, 0.6]"
           :initial-breakpoint="0.2"
-          :is-open="isOpen"
+          :is-open="store.state.taxSheetOpen"
       >
         <ion-content class="ion-padding">
           <ion-list v-if="taxes.length">
@@ -117,7 +156,8 @@ import {
   IonLabel,
   IonCard,
   IonCardContent,
-  IonText
+  IonText,
+  IonToggle
 } from "@ionic/vue";
 import {balloonOutline, beakerOutline, warningOutline, checkmarkCircleOutline} from "ionicons/icons";
 import store from "@/store/index.js";
@@ -128,6 +168,7 @@ import CountrySelector from "@/components/CountrySelector.vue";
 export default defineComponent({
   name: "salesTaxPage",
   components: {
+    IonToggle,
     IonText,
     CountrySelector,
     IonIcon,
@@ -155,10 +196,14 @@ export default defineComponent({
       checkmarkCircleOutline,
       defaultTax: null,
       totalTax: 0,
-      amount: 0
+      amount: 0,
+      originalAmount: 0,
+      store,
+      taxInclusive: false
     }
   },
   computed: {
+
     countryCode() {
       return store.state.myCountry;
     },
@@ -168,39 +213,83 @@ export default defineComponent({
     formatedTotalAmount() {
 
       return Intl.NumberFormat('en-US').format(this.totalTax);
+    },
+
+    formatedOriginalAmount() {
+
+      return Intl.NumberFormat('en-US').format(this.originalAmount);
+
+    },
+    formatedTaxAmount() {
+
+      return Intl.NumberFormat('en-US').format(this.totalTax);
+
     }
+
+
   },
 
   watch: {
     amount() {
+
       if (this.defaultTax) {
+        if (!this.taxInclusive) {
 
-        const maintaxAmount = (this.defaultTax.rate / 100) * Number(this.amount)
-        this.totalTax = maintaxAmount;
+          const subTax = this.defaultTax.sub_rate ? (this.defaultTax.sub_rate / 100) * Number(this.amount) : 0;
 
-        this.defaultTax.amount = this.formatAmount(maintaxAmount);
+          const compoundAmount = subTax + this.amount;
 
-        const compoundAmount = maintaxAmount + this.amount;
+          const maintaxAmount = (this.defaultTax.rate / 100) * Number(compoundAmount)
 
-        if (this.defaultTax.sub_tax) {
-          for (let i = 0; i < this.defaultTax.sub_tax.length; i++) {
+          this.totalTax = maintaxAmount;
 
-            const taxAmount = (Number(this.defaultTax.sub_tax[i].rate) / 100) * compoundAmount;
+          this.defaultTax.amount = this.formatAmount(maintaxAmount);
 
-            this.totalTax += taxAmount;
 
-            this.defaultTax.sub_tax[i].amount = this.formatAmount(taxAmount);
+          if (this.defaultTax.sub_tax) {
+            for (let i = 0; i < this.defaultTax.sub_tax.length; i++) {
 
+              const taxAmount = (Number(this.defaultTax.sub_tax[i].rate) / 100) * Number(this.amount);
+
+              this.totalTax += taxAmount;
+
+              this.defaultTax.sub_tax[i].amount = this.formatAmount(taxAmount);
+
+            }
           }
+
+        } else {
+
+          const amount = 1;
+
+          const subtax = this.defaultTax.sub_rate ? (this.defaultTax.sub_rate / 100) * amount : 0;
+
+          const compoundAmount = subtax + amount;
+
+          const maintaxAmount = (this.defaultTax.rate / 100) * compoundAmount;
+
+          let totalTax = maintaxAmount + subtax + amount;
+
+
+          const realTax = (this.amount / totalTax).toFixed(2);
+
+          this.totalTax = (this.amount - realTax).toFixed(2);
+
+          this.originalAmount = realTax;
+
+
         }
-
-
       }
 
 
     }
   },
   methods: {
+    haddleToggle(checked) {
+      this.taxInclusive = checked.detail.checked;
+      this.amount=0;
+      this.originalAmount=0;
+    },
 
     formatAmount(amount) {
 
@@ -216,21 +305,33 @@ export default defineComponent({
 
     },
     getTaxes() {
+      const cacheKey = this.countryCode + "_taxes";
+
+      const oldTaxes = localStorage.getItem(cacheKey);
+
+      if (oldTaxes) {
+
+        this.taxes = JSON.parse(oldTaxes);
+      }
+
+
       axios.get("/country/" + this.countryCode + "/taxes")
           .then(res => {
 
+
             const newTaxes = res.data.data;
+
+            localStorage.setItem(cacheKey, JSON.stringify(newTaxes));
 
             this.taxes = newTaxes;
 
-            // if (newTaxes.length) {
-            //   store.state.selectedTax =newTaxes[0];
-            // }
 
           })
     }
   },
   mounted() {
+    this.store.state.taxSheetOpen = true;
+
     this.getTaxes();
   }
 });

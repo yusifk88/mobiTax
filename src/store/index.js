@@ -4,7 +4,8 @@ export default createStore({
   state: {
     countries:[],
     myCountry:"GH",
-    selectedTax:null
+    selectedTax:null,
+    taxSheetOpen:true
   },
   mutations: {
   },
