@@ -6,8 +6,9 @@
           <ion-back-button default-href="/" text="Home"></ion-back-button>
         </ion-buttons>
         <ion-title>Sales taxes calculator</ion-title>
-        <ion-buttons slot="end">
-          <country-selector></country-selector>
+        <ion-buttons slot="end" class="ion-padding-end">
+          <flag :iso="countryCode" style="margin-right: 4px"/>
+          {{ countryCode }}
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -23,7 +24,7 @@
 
       <span v-show="defaultTax">
 
-        <ion-item>
+        <ion-item class="ion-margin-top">
           <ion-toggle mode="ios" @ionChange="haddleToggle">Amount includes tax</ion-toggle>
         </ion-item>
 

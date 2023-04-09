@@ -1,7 +1,7 @@
 <template>
   <ion-content :fullscreen="true" class="ion-padding" style="transition: 0.3s ease-in-out">
 
-    <ion-item v-if="date" style="border: 1px solid lightgrey; border-radius: 10px;">
+    <ion-item class="ion-margin-top" v-if="date" style="border: 1px solid lightgrey; border-radius: 10px;">
 
       Payroll Date:
       <ion-datetime-button class="ion-margin-start" datetime="datetime"></ion-datetime-button>
@@ -67,7 +67,7 @@
                 mode="ios"
                 shape="round"
                 size="large"
-                style="bottom: 0; position: fixed; width: 90%"
+                class="ion-margin-top"
                 @click="calculcate">
       Calculate
       <span v-if="progress" class="ion-margin-start">

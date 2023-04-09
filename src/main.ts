@@ -37,9 +37,16 @@ const app = createApp(App).use(store)
     .use(FlagIcon);
 
 router.isReady().then(() => {
+
+    if (localStorage.getItem('myCountry')) {
+
+        store.state.myCountry = localStorage.getItem('myCountry');
+    }
+
     if (localStorage.getItem('countries')) {
 
         const countryString = localStorage.getItem('countries');
+        // @ts-ignore
         store.state.countries = JSON.parse(countryString);
 
     }
