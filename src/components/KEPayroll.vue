@@ -1,7 +1,7 @@
 <template>
   <ion-content :fullscreen="true" class="ion-padding" style="transition: 0.3s ease-in-out">
 
-    <ion-item v-if="date" style="border: 1px solid lightgrey;border-radius: 10px;">
+    <ion-item v-if="date" style="border: 1px solid lightgrey; border-radius: 10px;">
 
       Payroll Date:
       <ion-datetime-button class="ion-margin-start" datetime="datetime"></ion-datetime-button>
@@ -31,33 +31,35 @@
 
 
     <ion-item class="ion-margin-top" lines="none">
-      <input v-model="allowance" class="mobitax-input" placeholder="Allowance" type="number">
+      <input v-model="allowance" class="mobitax-input" placeholder="Benefits" type="number">
 
     </ion-item>
+    <small class="text-muted ion-margin-start">Such as allowances and bonuses</small>
 
     <ion-item class="ion-margin-top" lines="none">
-      <input v-model="bonus" class="mobitax-input" placeholder="Bonus" type="number">
-
-    </ion-item>
-
-
-    <ion-item class="ion-margin-top" lines="none">
-      <input v-model="reimbursement" class="mobitax-input" placeholder="Reimbursement" type="number">
-
+      <input v-model="other_pensions" class="mobitax-input" placeholder="Other Pensions" type="number">
     </ion-item>
 
 
     <ion-item class="ion-margin-top" lines="none">
-      <ion-toggle :checked="isResident" mode="ios" @ionChange="residentToggleChanged">Resident</ion-toggle>
+      <ion-toggle :checked="deduct_nssf" mode="ios" @ionChange="residentToggleChanged">Deduct NSSF</ion-toggle>
+    </ion-item>
+
+    <ion-item v-if="deduct_nssf"
+              class="ion-margin-top ion-margin-bottom"
+              lines="none"
+              style="border: 1px solid lightgrey; border-radius: 10px; transition: 0.3s ease-in-out">
+      <ion-select :interface-options="selectOptions" :value="nssf_rate" aria-label="Fruit" interface="action-sheet"
+                  label="Method:" placeholder="Select Method">
+        <ion-select-option value="new_method">Tiered</ion-select-option>
+        <ion-select-option value="old_method">Old Rate({{ currencyCode }}200)</ion-select-option>
+      </ion-select>
     </ion-item>
 
     <ion-item class="ion-margin-top" lines="none">
-      <ion-toggle :checked="deductPension" mode="ios" @ionChange="pensionToggleChanged">Deduct Pension</ion-toggle>
+      <ion-toggle :checked="deduct_nhif" mode="ios" @ionChange="pensionToggleChanged">Deduct NHIF</ion-toggle>
     </ion-item>
 
-    <ion-item class="ion-margin-top" lines="none">
-      <ion-toggle :checked="deductIncomeTax" mode="ios" @ionChange="taxToggleChanged">Deduct Income Tax</ion-toggle>
-    </ion-item>
 
     <ion-button :disabled="!inputIsValid || progress"
                 color="primary"
@@ -73,7 +75,9 @@
       </span>
     </ion-button>
 
-    <ion-modal ref="modal" :is-open="showPayslip" trigger="open-modal" @didDismiss="payslipHide">
+    <ion-modal
+        @didDismiss="payslipHide"
+        ref="modal" :is-open="showPayslip" trigger="open-modal">
       <ion-header class="ion-no-border custom">
         <ion-toolbar>
           <ion-title>Payslip</ion-title>
@@ -85,24 +89,14 @@
         </ion-toolbar>
       </ion-header>
       <ion-content v-if="payslip" class="ion-padding">
-        <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          Basic Pay:{{ formatAmount(payslip.basic_pay) }}
-        </p>
-        <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          Taxable Income:{{ formatAmount(payslip.taxable_income) }}
-        </p>
-
         <p class="ion-margin-start text-muted" style="font-weight: 18px; font-style: italic;">Earnings</p>
 
         <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          Allowance:{{ formatAmount(payslip.allowance) }}
+          Basic Pay:{{ formatAmount(payslip.basic_pay) }}
         </p>
 
         <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          Bonus: {{ formatAmount(payslip.bonus) }}
-        </p>
-        <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          Reimbursement:{{ formatAmount(payslip.reimbursement) }}
+          Benefits::{{ formatAmount(payslip.benefits) }}
         </p>
 
         <ion-text color="primary">
@@ -112,18 +106,27 @@
           </p>
         </ion-text>
 
-        <p class="text-muted ion-margin-start" style="font-weight: 18px; font-style: italic;">Deductions</p>
+
+        <p class="ion-margin-start text-muted" style="font-weight: 18px; font-style: italic;">Deductions</p>
+
 
         <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          Bonus Tax:{{ formatAmount(payslip.bonus_tax) }}
+          P.A.Y.E:{{ formatAmount(payslip.net_paye) }}
         </p>
 
-        <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          P.A.Y.E: {{ formatAmount(payslip.paye) }}
-        </p>
 
         <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          SSNIT: {{ formatAmount(payslip.ssnit) }}
+          NSSF:{{ formatAmount(payslip.nssf) }}
+        </p>
+
+
+        <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
+          NHIF:{{ formatAmount(payslip.nhif) }}
+        </p>
+
+
+        <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
+          Other Pensions:{{ formatAmount(payslip.other_pensions) }}
         </p>
 
         <ion-text color="danger">
@@ -140,6 +143,55 @@
         </ion-text>
 
 
+        <ion-button color="primary"
+                    expand="block"
+                    fill="clear"
+                    mode="ios"
+                    @click="showTaxation=!showTaxation">
+          {{ showTaxation ? "Hide" : "Show" }} Taxation
+          <ion-icon v-if="!showTaxation" :icon="chevronDown"></ion-icon>
+          <ion-icon v-else :icon="chevronUp"></ion-icon>
+
+        </ion-button>
+
+        <span v-if="showTaxation" style="transition: 0.3s ease-in-out">
+
+        <p class="text-muted ion-margin-start" style="font-weight: 18px; font-style: italic;">Taxations</p>
+
+
+
+        <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
+          Chargeable Pay:{{ formatAmount(payslip.chargeable_income) }}
+        </p>
+
+
+
+        <p class="ion-margin-start" style="font-size: 20px; font-weight: lighter; margin-left: 35px;">
+          Personal Relief: {{ formatAmount(payslip.personal_relief) }}
+        </p>
+
+
+        <p class="ion-margin-start" style="font-size: 20px; font-weight: lighter;margin-left: 35px;">
+          NHIF Relief(15%): {{ formatAmount(payslip.nhif_relief) }}
+        </p>
+        <ion-text color="danger">
+
+      <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
+          Tax Charged: {{ formatAmount(Number(payslip.nhif_relief)+Number(payslip.personal_relief)) }}
+        </p>
+        </ion-text>
+
+        <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
+          Net Tax: {{ formatAmount(payslip.net_paye) }}
+        </p>
+
+
+        <p class="ion-margin-start" style="font-size: 20px; font-weight: lighter;margin-left: 35px;">
+          Pension Relief: {{ formatAmount(payslip.pension_relief) }}
+        </p>
+
+        </span>
+
       </ion-content>
 
 
@@ -147,32 +199,34 @@
 
 
   </ion-content>
+
 </template>
 
 <script>
-import {closeOutline} from "ionicons/icons";
 import {
   IonButton,
   IonContent,
   IonDatetime,
   IonDatetimeButton,
-  IonItem,
-  IonLabel,
-  IonToggle,
   IonIcon,
+  IonItem,
+  IonLabel, IonSpinner,
   IonText,
-  IonSpinner
+  IonToggle,
+  IonSelect,
+  IonSelectOption
 } from "@ionic/vue";
+import {closeOutline, chevronDown, chevronUp} from "ionicons/icons";
 import axios from "axios";
 
 export default {
+  name: "KEPayroll",
   props: {
     countryCode: {
-      default: "GH",
+      default: "KE",
       type: String
     }
   },
-  name: "GHPayslip",
   components: {
     IonContent,
     IonButton,
@@ -183,10 +237,20 @@ export default {
     IonToggle,
     IonIcon,
     IonText,
-    IonSpinner
+    IonSpinner,
+    IonSelect,
+    IonSelectOption
   },
   data() {
     return {
+      selectOptions: {
+        header: "Select Method",
+        subHeader: 'Select how NSSF should be calculated',
+        translucent: true
+      },
+      showTaxation: false,
+      deduct_nssf: true,
+      deduct_nhif: true,
       basic_salary: null,
       bonus: null,
       allowance: null,
@@ -198,8 +262,12 @@ export default {
       payslip: null,
       showPayslip: false,
       closeOutline,
-      currencyCode: "GHS",
-      progress: false
+      currencyCode: "KSH",
+      progress: false,
+      nssf_rate: 'new_method',
+      other_pensions: null,
+      chevronDown,
+      chevronUp
     }
   },
   computed: {
@@ -209,7 +277,6 @@ export default {
   },
   methods: {
     payslipHide(){
-
       this.showPayslip=false;
     },
     formatAmount(amount) {
@@ -225,7 +292,7 @@ export default {
 
     },
     residentToggleChanged(checked) {
-      this.isResident = checked.detail.checked;
+      this.deduct_nssf = checked.detail.checked;
 
     }
     ,
@@ -238,14 +305,16 @@ export default {
 
       const data = {
         basic_pay: Number(this.basic_salary),
-        bonus: Number(this.bonus),
-        allowance: Number(this.allowance),
-        status: this.isResident ? "resident" : "nonresident",
-        deduct_pension: this.deductPension,
-        reimbursement: Number(this.reimbursement),
-        deduct_paye: this.deductIncomeTax,
-        date: new Date(this.date).toJSON().slice(0, 10)
+        benefits: Number(this.allowance),
+        status: "resident",
+        deduct_nssf: this.deduct_nssf,
+        deduct_nhif: this.deduct_nhif,
+        nssf_rate: this.nssf_rate,
+        date: new Date(this.date).toJSON().slice(0, 10),
+        other_pensions: Number(this.other_pensions)
       }
+
+
       this.progress = true;
 
       const URL = "/payroll/" + this.countryCode.toLowerCase() + "/gross-to-net";
@@ -253,8 +322,9 @@ export default {
       axios.post(URL, data)
           .then(res => {
 
-            this.showPayslip = true;
+
             this.payslip = res.data.data;
+            this.showPayslip = true;
 
             this.progress = false;
 
@@ -275,22 +345,6 @@ export default {
 }
 </script>
 
-<style>
-.mobitax-input {
-  width: 100%;
-  height: 50px;
-  font-size: 35px;
-  font-weight: lighter;
-  border: none;
-  text-align: center;
-  background-color: #CCCCCC2F;
-  border-radius: 15px;
-}
+<style scoped>
 
-.mobitax-input:focus {
-
-  border: none;
-  outline: none;
-
-}
 </style>

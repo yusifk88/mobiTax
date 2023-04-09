@@ -34,6 +34,8 @@
       </ion-toolbar>
     </ion-header>
   <g-h-payslip v-if="countryCode==='GH'"></g-h-payslip>
+    <k-e-payroll v-if="countryCode==='KE'"></k-e-payroll>
+    <s-l-payroll v-if="countryCode==='SL'"></s-l-payroll>
   </ion-page>
 </template>
 
@@ -43,10 +45,14 @@ import {IonPage, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBac
 import CountrySelector from "@/components/CountrySelector.vue";
 import store from "@/store/index.js";
 import GHPayslip from "@/components/GHPayslip.vue";
+import KEPayroll from "@/components/KEPayroll.vue";
+import SLPayroll from "@/components/SLPayroll.vue";
 
 export default {
   name: "payrollPage",
   components: {
+    SLPayroll,
+    KEPayroll,
     GHPayslip,
     CountrySelector, IonToolbar, IonHeader, IonPage, IonContent, IonTitle, IonButtons, IonBackButton,IonButton,IonIcon},
   data(){

@@ -40,53 +40,31 @@
 
       </ion-card>
 
+      <ion-button @click="$router.push('/vat')" style="height: 100px" mode="ios" class="ion-margin" size="large" color="primary" expand="block">
+        <span class="ion-text-center ion-margin-end" style="background-color: rgba(255,255,255,0.22); border-radius: 15px">
 
-      <ion-card class="ion-margin-top" color="primary" @click="$router.push('/vat')">
-        <ion-card-content>
-          <ion-row>
-            <ion-col size="auto">
-              <div class="ion-text-center" style="background-color: rgba(255,255,255,0.22); border-radius: 15px">
+          <ion-icon :icon="calculatorOutline" class="ion-margin" size="large"></ion-icon>
+        </span>
+        Sales Taxes
 
-                <ion-icon :icon="calculatorOutline" class="ion-margin" size="large"></ion-icon>
+        <ion-icon :icon="chevronForward" class="ion-margin" size="large"></ion-icon>
 
-              </div>
-            </ion-col>
-            <ion-col size="auto">
-              <h1>Sales Taxes</h1>
-              <p>Calculate sales taxes</p>
-            </ion-col>
-            <ion-col size="auto">
-              <ion-icon :icon="chevronForward" class="ion-margin" size="large"></ion-icon>
-            </ion-col>
-          </ion-row>
+      </ion-button>
 
-        </ion-card-content>
-      </ion-card>
+      <ion-button color="warning" @click="$router.push('/payslip')" style="height: 100px" mode="ios" class="ion-margin" size="large" expand="block">
+        <span class="ion-text-center ion-margin-end" style="background-color: rgba(255,255,255,0.22); border-radius: 15px;">
+
+          <ion-icon class="ion-margin" :icon="speedometerOutline" size="large"></ion-icon>
+
+        </span>
+        Payroll
+
+        <ion-icon :icon="chevronForward" class="ion-margin" size="large"></ion-icon>
+
+      </ion-button>
 
 
-      <ion-card color="warning" @click="$router.push('/payslip')">
-        <ion-card-content>
-          <ion-row>
-            <ion-col size="3">
-              <div class="ion-text-center" style="background-color: rgba(255,255,255,0.22); border-radius: 15px;">
 
-                <ion-icon class="ion-margin" :icon="speedometerOutline" size="large"></ion-icon>
-
-              </div>
-            </ion-col>
-
-            <ion-col size="6">
-              <h1>Payroll</h1>
-              <p>Calculate net pay</p>
-            </ion-col>
-
-            <ion-col size="3">
-              <ion-icon :icon="chevronForward"  class="ion-margin" size="large"></ion-icon>
-            </ion-col>
-          </ion-row>
-
-        </ion-card-content>
-      </ion-card>
 
     </ion-content>
   </ion-page>

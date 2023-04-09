@@ -52,7 +52,7 @@
     </ion-item>
 
     <ion-item class="ion-margin-top" lines="none">
-      <ion-toggle :checked="deductPension" mode="ios" @ionChange="pensionToggleChanged">Deduct Pension</ion-toggle>
+      <ion-toggle :checked="deductPension" mode="ios" @ionChange="pensionToggleChanged">Deduct NASSIT:</ion-toggle>
     </ion-item>
 
     <ion-item class="ion-margin-top" lines="none">
@@ -99,8 +99,9 @@
         </p>
 
         <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          Bonus: {{ formatAmount(payslip.bonus) }}
+          Bonus:{{ formatAmount(payslip.bonus) }}
         </p>
+
         <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
           Reimbursement:{{ formatAmount(payslip.reimbursement) }}
         </p>
@@ -115,15 +116,11 @@
         <p class="text-muted ion-margin-start" style="font-weight: 18px; font-style: italic;">Deductions</p>
 
         <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          Bonus Tax:{{ formatAmount(payslip.bonus_tax) }}
-        </p>
-
-        <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
           P.A.Y.E: {{ formatAmount(payslip.paye) }}
         </p>
 
         <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          SSNIT: {{ formatAmount(payslip.ssnit) }}
+          NASSIT: {{ formatAmount(payslip.nassit) }}
         </p>
 
         <ion-text color="danger">
@@ -147,6 +144,7 @@
 
 
   </ion-content>
+
 </template>
 
 <script>
@@ -164,15 +162,14 @@ import {
   IonSpinner
 } from "@ionic/vue";
 import axios from "axios";
-
 export default {
+  name: "SLPayroll",
   props: {
     countryCode: {
-      default: "GH",
+      default: "SL",
       type: String
     }
   },
-  name: "GHPayslip",
   components: {
     IonContent,
     IonButton,
@@ -198,7 +195,7 @@ export default {
       payslip: null,
       showPayslip: false,
       closeOutline,
-      currencyCode: "GHS",
+      currencyCode: "SLE",
       progress: false
     }
   },
@@ -236,21 +233,22 @@ export default {
 
     calculcate() {
 
-      const data = {
-        basic_pay: Number(this.basic_salary),
-        bonus: Number(this.bonus),
-        allowance: Number(this.allowance),
-        status: this.isResident ? "resident" : "nonresident",
-        deduct_pension: this.deductPension,
-        reimbursement: Number(this.reimbursement),
-        deduct_paye: this.deductIncomeTax,
-        date: new Date(this.date).toJSON().slice(0, 10)
-      }
       this.progress = true;
+
+      const formData = new FormData();
+      formData.append("basic_pay",Number(this.basic_salary));
+      formData.append("bonus",Number(this.bonus));
+      formData.append("allowance",Number(this.allowance));
+      formData.append("status","resident");
+      formData.append("deduct_pension",this.deductPension);
+      formData.append("reimbursement",Number(this.reimbursement));
+      formData.append("deduct_paye",this.deductIncomeTax);
+      formData.append("date",new Date(this.date).toJSON().slice(0, 10));
+
 
       const URL = "/payroll/" + this.countryCode.toLowerCase() + "/gross-to-net";
 
-      axios.post(URL, data)
+      axios.post(URL, formData)
           .then(res => {
 
             this.showPayslip = true;
@@ -275,22 +273,6 @@ export default {
 }
 </script>
 
-<style>
-.mobitax-input {
-  width: 100%;
-  height: 50px;
-  font-size: 35px;
-  font-weight: lighter;
-  border: none;
-  text-align: center;
-  background-color: #CCCCCC2F;
-  border-radius: 15px;
-}
+<style scoped>
 
-.mobitax-input:focus {
-
-  border: none;
-  outline: none;
-
-}
 </style>
