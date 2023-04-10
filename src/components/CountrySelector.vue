@@ -5,16 +5,24 @@
     <ion-icon :icon="chevronDown"></ion-icon>
   </ion-button>
 
-  <ion-modal ref="countryModal" :breakpoints="[0, 0.25, 0.5, 0.75,0.8,1]" :initial-breakpoint="0.25" trigger="country-modal">
+  <ion-modal ref="countryModal" :breakpoints="[0, 0.25, 0.5, 0.75,0.8,1]" :initial-breakpoint="0.4" trigger="country-modal">
     <ion-content class="ion-padding">
       <ion-list>
-        <ion-item v-for="country in countries" :key="country.code" @click="selectCountry(country.code)">
+        <ion-item
+
+            :color="country.code== myCountry ? 'success' : ''"
+            style="border-radius: 15px"
+
+
+            v-for="country in countries" :key="country.code" @click="selectCountry(country.code)">
           <ion-label>
             <h2>
               <flag :iso="country.code" style="margin-right: 4px"/>
               {{ country.name }}({{ country.code }})
             </h2>
           </ion-label>
+          <ion-icon size="large" style="transition: 0.2s ease-in-out" v-if="country.code== myCountry"  slot="end" :icon="checkmarkCircleOutline"></ion-icon>
+
         </ion-item>
 
       </ion-list>
@@ -26,7 +34,7 @@
 
 import store from "../store";
 import {IonButton, IonIcon, IonModal, IonHeader, IonSearchbar} from '@ionic/vue';
-import {chevronDown} from "ionicons/icons";
+import {chevronDown,checkmarkCircleOutline} from "ionicons/icons";
 
 export default {
   name: "CountrySelector",
@@ -35,7 +43,8 @@ export default {
     return {
       chevronDown,
       store,
-      search: ""
+      search: "",
+      checkmarkCircleOutline
     }
   },
   computed: {

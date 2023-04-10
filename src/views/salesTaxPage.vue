@@ -110,6 +110,7 @@
           :breakpoints="[0.2,0.25, 0.5, 0.6]"
           :initial-breakpoint="0.2"
           :is-open="store.state.taxSheetOpen"
+          ref="taxes-modal"
       >
         <ion-content class="ion-padding">
           <ion-list v-if="taxes.length">
@@ -118,12 +119,16 @@
                 v-for="tax in taxes"
                 :key="tax.id"
                 v-on:click="selectTax(tax)"
+                :color="defaultTax && defaultTax.id==tax.id ? 'success' : ''"
+                style="border-radius: 15px"
             >
-              <ion-icon slot="start" :icon="beakerOutline">
-              </ion-icon>
+              <ion-icon size="large" style="transition: 0.2s ease-in-out" v-if="defaultTax && defaultTax.id==tax.id"  slot="start" :icon="checkmarkCircleOutline"></ion-icon>
+              <ion-icon style="transition: 0.2s ease-in-out" v-else slot="start" :icon="beakerOutline"></ion-icon>
 
-              <ion-label style="transition: 0.3s ease-in-out">
-                <h2>{{ tax.name }}({{ tax.rate }}%)</h2>
+              <ion-label style="transition: 0.2s ease-in-out">
+                  <h2>{{ tax.name }}({{ tax.rate }}%)</h2>
+                <ion-text :color="defaultTax && defaultTax.id==tax.id ? 'light' : ''">
+
                 <p v-if="tax.type.toLowerCase()==='flat'">Flat Rate</p>
                 <p v-if="tax.type.toLowerCase()==='compound'">
                   Includes: <span v-for="subtax in tax.sub_tax" :key="subtax.id">
@@ -131,7 +136,10 @@
                   </span>
 
                 </p>
+                </ion-text>
+
               </ion-label>
+
             </ion-item>
 
           </ion-list>
@@ -303,6 +311,7 @@ export default defineComponent({
       this.amount = 0;
       this.totalTax = 0;
       document.getElementById("amount-input").focus();
+      this.$refs["taxes-modal"].$el.setCurrentBreakpoint(0.2);
 
     },
     getTaxes() {

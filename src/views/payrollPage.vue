@@ -19,7 +19,10 @@
 
             <ion-content class="ion-padding">
               <ion-list>
-                <ion-item v-for="country in suportedCountries" :key="country.code"
+                <ion-item
+                    style="border-radius: 15px"
+                    :color="country.code== countryCode ? 'success' : ''"
+                    v-for="country in suportedCountries" :key="country.code"
                           @click="countryCode=country.code; $refs.payrollcountryModal.dismiss(null, 'cancel')">
                   <ion-label>
                     <h2>
@@ -27,6 +30,8 @@
                       {{ country.name }}({{ country.code }})
                     </h2>
                   </ion-label>
+                  <ion-icon size="large" style="transition: 0.2s ease-in-out" v-if="country.code== countryCode"  slot="end" :icon="checkmarkCircleOutline"></ion-icon>
+
                 </ion-item>
 
               </ion-list>
@@ -44,7 +49,7 @@
 </template>
 
 <script>
-import {chevronDown} from "ionicons/icons";
+import {chevronDown,checkmarkCircleOutline} from "ionicons/icons";
 import {
   IonPage,
   IonContent,
@@ -74,7 +79,8 @@ export default {
     return {
       countryCode: "GH",
       chevronDown,
-      accepted: ['GH', 'SL', 'KE']
+      accepted: ['GH', 'SL', 'KE'],
+      checkmarkCircleOutline
     }
   },
   computed: {
