@@ -1,7 +1,8 @@
 <template>
   <ion-content :fullscreen="true" class="ion-padding" style="transition: 0.3s ease-in-out">
 
-    <ion-item class="ion-margin-top" v-if="date" style="border: 1px solid lightgrey; border-radius: 10px;">
+    <ion-item v-if="date" class="ion-margin-top"
+              style="border: 1px solid lightgrey; border-radius: 10px; margin-top: 30px;">
 
       Payroll Date:
       <ion-datetime-button class="ion-margin-start" datetime="datetime"></ion-datetime-button>
@@ -50,7 +51,8 @@
               lines="none"
               style="border: 1px solid lightgrey; border-radius: 10px; transition: 0.3s ease-in-out">
       <ion-select :interface-options="selectOptions" :value="nssf_rate" aria-label="Fruit" interface="action-sheet"
-                  label="Method:" placeholder="Select Method">
+                  label="Method:"
+                  placeholder="Select Method" @ionChange="methodChange">
         <ion-select-option value="new_method">Tiered</ion-select-option>
         <ion-select-option value="old_method">Old Rate({{ currencyCode }}200)</ion-select-option>
       </ion-select>
@@ -62,12 +64,12 @@
 
 
     <ion-button :disabled="!inputIsValid || progress"
+                class="ion-margin-top"
                 color="primary"
                 expand="block"
                 mode="ios"
                 shape="round"
                 size="large"
-                class="ion-margin-top"
                 @click="calculcate">
       Calculate
       <span v-if="progress" class="ion-margin-start">
@@ -76,8 +78,8 @@
     </ion-button>
 
     <ion-modal
-        @didDismiss="payslipHide"
-        ref="modal" :is-open="showPayslip" trigger="open-modal">
+        ref="modal"
+        :is-open="showPayslip" trigger="open-modal" @didDismiss="payslipHide">
       <ion-header class="ion-no-border custom">
         <ion-toolbar>
           <ion-title>Payslip</ion-title>
@@ -177,7 +179,7 @@
         <ion-text color="danger">
 
       <p class="ion-margin-start" style="font-size: 28px; font-weight: lighter">
-          Tax Charged: {{ formatAmount(Number(payslip.nhif_relief)+Number(payslip.personal_relief)) }}
+          Tax Charged: {{ formatAmount(Number(payslip.nhif_relief) + Number(payslip.personal_relief)) }}
         </p>
         </ion-text>
 
@@ -276,8 +278,13 @@ export default {
     }
   },
   methods: {
-    payslipHide(){
-      this.showPayslip=false;
+
+    methodChange(method) {
+      this.nssf_rate = method.detail.value;
+    },
+
+    payslipHide() {
+      this.showPayslip = false;
     },
     formatAmount(amount) {
       return this.currencyCode + Intl.NumberFormat('en-US').format(amount);

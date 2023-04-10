@@ -12,6 +12,7 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
+
     <ion-content :fullscreen="true" class="ion-padding">
 
       <ion-card v-show="!defaultTax">
@@ -29,7 +30,7 @@
         </ion-item>
 
         <ion-card>
-          <ion-card-content class="ion-no-padding">
+          <ion-card-content>
             <input id="amount-input" v-model="amount" class="number-input" placeholder="Amount" type="number">
           </ion-card-content>
         </ion-card>
@@ -37,12 +38,12 @@
 
       <ion-card v-if="!taxInclusive" style="transition: 0.3s ease-in-out">
 
-        <ion-card-content v-if="defaultTax" class="ion-no-padding">
-          <h1 v-if="defaultTax && defaultTax.type=='Flat'"
+        <ion-card-content v-if="defaultTax" >
+          <p v-if="defaultTax && defaultTax.type=='Flat'"
               style="font-weight: lighter; font-size: 25px; border-bottom: 1px solid grey">{{
               defaultTax ? defaultTax.name : ""
             }}
-            ({{ defaultTax ? defaultTax.rate : "" }}%):</h1>
+            ({{ defaultTax ? defaultTax.rate : "" }}%):</p>
 
           <span v-if="defaultTax.type='Compound'">
 
@@ -75,7 +76,7 @@
 
       <ion-card v-else style="transition: 0.3s ease-in-out">
 
-        <ion-card-content class="ion-no-padding">
+        <ion-card-content>
 
             <p style="font-weight: lighter; font-size: 35px; border-bottom: 1px double; margin-top: 30px">Amount :{{
                 formatedOriginalAmount

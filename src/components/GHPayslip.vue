@@ -1,7 +1,7 @@
 <template>
   <ion-content :fullscreen="true" class="ion-padding" style="transition: 0.3s ease-in-out">
 
-    <ion-item class="ion-margin-top" v-if="date" style="border: 1px solid lightgrey;border-radius: 10px;">
+    <ion-item class="ion-margin-top" v-if="date" style="border: 1px solid lightgrey;border-radius: 10px; margin-top: 30px;">
 
       Payroll Date:
       <ion-datetime-button class="ion-margin-start" datetime="datetime"></ion-datetime-button>
