@@ -83,7 +83,7 @@
               }}</p>
 
           <p style="font-weight: lighter; font-size: 35px; border-bottom: 1px double; margin-top: 30px">Tax ({{ defaultTax.rate }}%):{{
-              totalTax
+              formatedTotalTax
             }}
 
             <small style="font-size: 14px; display: block" v-if="defaultTax.sub_tax">
@@ -213,6 +213,11 @@ export default defineComponent({
     }
   },
   computed: {
+    formatedTotalTax(){
+
+      return Intl.NumberFormat('en-US').format(this.totalTax);
+
+    },
 
     countryCode() {
       return store.state.myCountry;

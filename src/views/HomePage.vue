@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true" class="ion-no-border custom">
+    <ion-header class="ion-no-border">
       <ion-toolbar>
         <ion-title>MobiTax</ion-title>
         <ion-buttons slot="end">
@@ -10,8 +10,6 @@
     </ion-header>
 
     <ion-content :fullscreen="true" class="ion-padding-top">
-
-
 
       <ad-slider></ad-slider>
 
@@ -45,7 +43,7 @@
   </ion-page>
 </template>
 
-<script lang="ts">
+<script>
 import {
   IonContent,
   IonHeader,
@@ -54,6 +52,7 @@ import {
   IonTitle,
   IonToolbar,
   IonText,
+    IonIcon
 } from '@ionic/vue';
 
 import {chevronForward, calculatorOutline, speedometerOutline} from "ionicons/icons";
@@ -72,7 +71,8 @@ export default defineComponent({
     IonToolbar,
     IonText,
     IonHeader,
-    CountrySelector
+    CountrySelector,
+    IonIcon
   },
   data() {
     return {

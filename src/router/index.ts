@@ -4,7 +4,6 @@ import HomePage from '@/views/HomePage.vue';
 import salesTaxpage from '@/views/salesTaxPage.vue';
 import payrolPage from '@/views/payrollPage.vue';
 import store from "@/store";
-
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
@@ -25,10 +24,6 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Home',
         component: HomePage
     },
-    {
-        path: '/message/:id',
-        component: () => import('../views/ViewMessagePage.vue')
-    }
 ]
 
 const router = createRouter({
